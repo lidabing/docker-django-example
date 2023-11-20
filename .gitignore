@@ -8,9 +8,7 @@ public/*
 public_collected/*
 !public_collected/.keep
 
-.env*
-!.env.example
-docker-compose.override.yml
+
 
 
 ### Python ####################################################################
