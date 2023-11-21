@@ -2,6 +2,7 @@ import json
 from django.shortcuts import render
 import redis
 from django.http import JsonResponse
+from v1.redis_manager import redis_manager
 
 # Create your views here.
 def hello(request):
@@ -11,7 +12,7 @@ def hello(request):
     if value:
         value = json.loads(value)  # Convert the string back to a dict
     #value = 'hello world'
-    return JsonResponse({'value': value})
+    return JsonResponse(value)
 
 def realtime_bond_market(request):
     # 实现实时债券市场逻辑
@@ -19,7 +20,10 @@ def realtime_bond_market(request):
 
 def basic_bonds(request):
     # 实现转债的基础信息逻辑
-    return JsonResponse({'message': 'Basic bond information'})
+    
+    data = redis_manager.get_data('basic_bonds_data')
+    return JsonResponse(data)
+    #return JsonResponse({'message': 'Basic bond information'})
 
 def upcoming_bonds(request):
     # 实现即将发行的转债逻辑

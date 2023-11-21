@@ -89,7 +89,7 @@ services:
 
   worker:
     <<: *default-app
-    command: celery -A config beat --loglevel=info
+    command: bash -c "celery -A config worker --loglevel=info & celery -A config beat --loglevel=info"
     entrypoint: []
     deploy:
       resources:
@@ -97,6 +97,7 @@ services:
           cpus: "${DOCKER_WORKER_CPUS:-0}"
           memory: "${DOCKER_WORKER_MEMORY:-0}"
     profiles: ["worker"]
+
 
   js:
     <<: *default-assets

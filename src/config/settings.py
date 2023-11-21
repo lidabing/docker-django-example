@@ -13,6 +13,7 @@ import os
 import socket
 from distutils.util import strtobool
 from pathlib import Path
+from datetime import datetime, timedelta
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -163,15 +164,26 @@ if DEBUG:
 
 
 CELERY_BEAT_SCHEDULE = {
-    'my-scheduled-task': {
-        'task': 'v1.tasks.my_task',
-        'schedule': 50.0,
+    'slow-scheduled-task': {
+        'task': 'v1.tasks.slow_task',
+        'schedule': 3600.0, # 一小时启动一次慢任务
     },
 }
 
-CELERY_BEAT_SCHEDULE = {
-    'download-and-save-data-every-50-seconds': {
-        'task': 'v1.tasks.download_and_save_data',  # 这应该是你的任务的完全限定名
-        'schedule':50.0,
-    },
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'download-and-save-data-every-50-seconds': {
+#         'task': 'v1.tasks.download_and_save_data',  # 这应该是你的任务的完全限定名
+#         'schedule':50.0,
+#     },
+# }
+
+# CELERY_BEAT_SCHEDULE = {
+#     'show_task': {
+#         'task': 'v1.tasks.my_task',  # 任务的完全限定名
+#         'schedule': 80,  # 任务的执行间隔
+#         'args': (),  # 任务的参数
+#         'options': {
+#             'eta': datetime.now()+timedelta(minutes=1),  # 任务的首次执行时间
+#         },
+#     },
+# }
