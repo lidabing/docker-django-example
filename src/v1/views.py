@@ -1,10 +1,17 @@
+import json
 from django.shortcuts import render
-
+import redis
 from django.http import JsonResponse
 
 # Create your views here.
 def hello(request):
-    return JsonResponse({'message': 'Hello, welcome to the bonds API!'})
+    r = redis.Redis(host='convertible_bond-redis-1', port=6379, db=0)
+     # 读取一个键的值
+    value = r.get('downloaded_data')
+    if value:
+        value = json.loads(value)  # Convert the string back to a dict
+    #value = 'hello world'
+    return JsonResponse({'value': value})
 
 def realtime_bond_market(request):
     # 实现实时债券市场逻辑

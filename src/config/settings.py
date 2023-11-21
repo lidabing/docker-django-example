@@ -165,6 +165,13 @@ if DEBUG:
 CELERY_BEAT_SCHEDULE = {
     'my-scheduled-task': {
         'task': 'v1.tasks.my_task',
-        'schedule': 30.0,
+        'schedule': 50.0,
+    },
+}
+
+CELERY_BEAT_SCHEDULE = {
+    'download-and-save-data-every-50-seconds': {
+        'task': 'v1.tasks.download_and_save_data',  # 这应该是你的任务的完全限定名
+        'schedule':50.0,
     },
 }
