@@ -17,4 +17,9 @@ def download_and_save_data():
 def slow_task():
     print('slow_task')
     JisiluData.update_basic_bonds()
+    JisiluData.update_upcoming_bonds()
+    JisiluData.update_upcoming_adjust_bonds()
+    JisiluData.update_proposed_adjust_bonds()
+    JisiluData.update_upcoming_adjust_condition_bonds()
+    JisiluData.update_expired_bonds()
     print('slow_task')

@@ -7,10 +7,12 @@ class RedisManager:
 
     def set_data(self, key, data):
         data_str = json.dumps(data,ensure_ascii=False)
-        self.r.set(key, data_str.encode('utf-8'))
+        print(f'Storing data: {data_str[:100]}')
+        self.r.set(key, data_str)
 
     def get_data(self, key):
-        data_str = self.r.get(key)
+        data_str = self.r.get(key).decode('utf-8')
+        print(f'Retrieved data: {data_str[:100]}') 
         if data_str:
             return json.loads(data_str)
         else:

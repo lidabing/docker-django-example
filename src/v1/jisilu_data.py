@@ -118,7 +118,7 @@ def updata_realtime_bonds_market_data():
     
    
 # 获取集思录的基础转债信息，该信息作为其他转债信息的基础，需要第一时间获取  
-# key:basic_bonds_data 
+# key:basic_bonds
 def update_basic_bonds():
     url = "https://www.jisilu.cn/webapi/cb/list/"
     referer = 'https://www.jisilu.cn/web/data/cb/list'
@@ -131,19 +131,23 @@ def update_basic_bonds():
     if response.status_code == 200:
         data = response.json()
         bonds_data = data.get("data", [])
-        new_data = create_result(response.status_code,'成功',bonds_data)
-        redis_manager.set_data('basic_bonds_data',new_data)     
+        #print(bonds_data)
+        #new_data = create_result(response.status_code,'成功',bonds_data)
+        redis_manager.set_data('basic_bonds',bonds_data)     
     else:
         print(f"请求失败，状态码: {response.status_code}")
 
 # 功能函数，获取基础转债信息
 def get_basic_bonds_data():
-    basic_bonds_data = redis_manager.get_data("basic_bonds_data")
-    if( basic_bonds_data == None and basic_bonds_data['data'] == None):
+    basic_bonds_data = redis_manager.get_data("basic_bonds")
+    if( basic_bonds_data == None):
            update_basic_bonds()    
-    return redis_manager.get_data("basic_bonds_data")['data']
+    return redis_manager.get_data("basic_bonds")
 
-def get_upcoming_bonds():
+# 获取集思录的基础转债信息，即将发行的转债  
+# key:upcoming_bonds
+def update_upcoming_bonds():
+    print("update_upcoming_bonds")
     url = "https://www.jisilu.cn/webapi/cb/pre/?history=N"
     referer = 'https://www.jisilu.cn/web/data/cb/list'
     response = get_bond_data(url,referer)
@@ -154,7 +158,7 @@ def get_upcoming_bonds():
         all_bonds_data = data.get("data", [])
     else:
         print(f"请求失败，状态码: {response.status_code}")
-        return create_result(response.status_code,'请求失败')
+        #return create_result(response.status_code,'请求失败')
 
     result = []
     for bond_data in all_bonds_data:
@@ -184,12 +188,14 @@ def get_upcoming_bonds():
             }        
             result.append(item)
             
-    return create_result(response.status_code,'成功',result)
+    redis_manager.set_data('upcoming_bonds',result)  
+    #return create_result(response.status_code,'成功',result)
 
 #['转债名称','转债代码','收盘价','溢价率','下修日计数','到期税前收益率','剩余年限','备注']
-def get_upcoming_adjust_bonds():
+# key->upcoming_adjust_bonds
+def update_upcoming_adjust_bonds():
     basic_bonds_data = get_basic_bonds_data()
-    
+    print('update_upcoming_adjust_bonds')
      #再获取基础转债信息
     ajust_bonds_url = "https://www.jisilu.cn/webapi/cb/adjust/"
     ajust_bonds_referer = 'https://www.jisilu.cn/web/data/cb/list'
@@ -201,14 +207,16 @@ def get_upcoming_adjust_bonds():
     else:
         print(f"请求失败，状态码: {adjust_bonds_response.status_code}")
         return create_result(adjust_bonds_response.status_code,'请求失败')
-    
+    print('update_upcoming_adjust_bonds1')
+    #print('data:',adjust_bonds_data)
     result = []
+    print(len(basic_bonds_data))
     for adjust_bond in adjust_bonds_data:
-        bond_code = adjust_bond["bond_id"]
+        bond_code = adjust_bond["bond_id"]  
         #15天以内可能要下修的转债，才会记录
         adjust_count = find_property_value(adjust_bonds_data,bond_code, 'adjust_count')
         adjust = parse_adjust_string(adjust_count)
-        #print(bond_code)
+        #print(adjust)
         #print(adjust_bond)
         if adjust == None:
             continue
@@ -249,29 +257,32 @@ def get_upcoming_adjust_bonds():
         }        
     
         result.append(item)
-        
-    return create_result(200,'成功',result)
+    print('update_upcoming_adjust_bonds2')
+    #print(result)
+    redis_manager.set_data('upcoming_adjust_bonds',result)  
 
 
 #['转债名称','转债代码','收盘价','溢价率','股东大会','备注']
-def get_proposed_adjust_bonds():
+# 已经提议下修的转债
+# key->proposed_adjust_bonds
+def update_proposed_adjust_bonds():
     url = 'https://www.jisilu.cn/webapi/cb/adjust/'
     referer = 'https://www.jisilu.cn/web/data/cb/adjust'
     
     response = get_bond_data(url,referer)
-    
     bonds_data = []
     if response.status_code == 200:
         data = response.json()
         bonds_data = data.get("data", [])
     else:
         print(f"请求失败，状态码: {response.status_code}")
-        return create_result(response.status_code,'请求失败')
+        #return create_result(response.status_code,'请求失败')
     
     result = []
     for bond in bonds_data:
         bond_code = bond["bond_id"]
-        adjust_count = find_property_value(bonds_data,bond_code, 'adjust_count')
+        #print(bond_code)
+        #adjust_count = find_property_value(bonds_data,bond_code, 'adjust_count')
         adjust_date = find_property_value(bonds_data,bond_code, 'adjust_date')
         #如果是过去的时间，就不统计了
         if is_past_time(adjust_date):
@@ -301,11 +312,13 @@ def get_proposed_adjust_bonds():
         }        
         result.append(item)
     
-    return create_result(200,'成功',result)
+    redis_manager.set_data('proposed_adjust_bonds',result)  
 
-
-def get_upcoming_adjust_condition_bonds():
+# 即将符合下修条件的转债
+# key->upcoming_adjust_condition_bonds
+def update_upcoming_adjust_condition_bonds():
     #先获取基础转债信息
+    print('update_upcoming_adjust_condition_bonds')
     basic_bonds_data = get_basic_bonds_data()
     
      #再获取基础转债信息
@@ -318,13 +331,14 @@ def get_upcoming_adjust_condition_bonds():
         adjust_bonds_data = data.get("data", [])
     else:
         print(f"请求失败，状态码: {adjust_bonds_response.status_code}")
-        return create_result(adjust_bonds_response.status_code,'请求失败')
-    
+        #return create_result(adjust_bonds_response.status_code,'请求失败')
+    print('update_upcoming_adjust_condition_bonds1')
     #['转债名称','转债代码','收盘价','溢价率','下修重算日','到期税前收益率','剩余年限','备注']
     result = []
     for bond_data in adjust_bonds_data:
         bond_code = bond_data["bond_id"]
         readjust_dt = find_property_value(adjust_bonds_data,bond_code, 'readjust_dt')
+        #print(readjust_dt)
         if is_within_one_month(readjust_dt):
             bond_nm = find_property_value(adjust_bonds_data,bond_code, 'bond_nm')
             bond_id = find_property_value(adjust_bonds_data,bond_code, 'bond_id')
@@ -338,7 +352,7 @@ def get_upcoming_adjust_condition_bonds():
             year_left = find_property_value(basic_bonds_data,bond_code, 'year_left')
 
             #item = [bond_nm,int(bond_id),price,premium_rt,readjust_dt,f"{ytm_rt}%",f"{year_left}"]
-            
+            print(bond_nm)
             item = {
             "bond_nm": bond_nm,
             "bond_id": bond_id,
@@ -350,7 +364,7 @@ def get_upcoming_adjust_condition_bonds():
             }        
             result.append(item)
         
-    return create_result(200,'成功',result)
+    redis_manager.set_data('upcoming_adjust_condition_bonds',result)  
 
 
 #这个函数要分析出来四种情况的转债
@@ -384,7 +398,7 @@ def get_redeem_status(string):
     else:
         return RedeemStatus.NOT_REDEEM_CONDITION #还没有达到强赎条件
     
-def get_expired_bonds():
+def update_expired_bonds():
     url = "https://www.jisilu.cn/webapi/cb/redeem/"
     referer = 'https://www.jisilu.cn/data/cbnew/'
     response = get_bond_data(url,referer)
@@ -466,9 +480,10 @@ def get_expired_bonds():
                 }        
             expriry_bond.append(cache)
     
-    return (
-        create_result(200, '成功', not_redeem_condition),
-        create_result(200, '成功', redeem_condition),
-        create_result(200, '成功', redeem_notice),
-        create_result(200, '成功', expriry_bond),
-    )
+    
+    # return (
+    #     create_result(200, '成功', not_redeem_condition),
+    #     create_result(200, '成功', redeem_condition),
+    #     create_result(200, '成功', redeem_notice),
+    #     create_result(200, '成功', expriry_bond),
+    # )
