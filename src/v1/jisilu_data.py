@@ -397,7 +397,12 @@ def get_redeem_status(string):
         return RedeemStatus.EXPIRING_BOND
     else:
         return RedeemStatus.NOT_REDEEM_CONDITION #还没有达到强赎条件
-    
+  
+# 获取过期相关转债，这个可以生成四张表单，分别是：
+# key->upcoming_mandatory_redeem_bonds
+# key->mandatory_redeem_condition_bonds
+# key->redeem_announced_bonds
+# key->upcoming_natural_expire_bonds    
 def update_expired_bonds():
     url = "https://www.jisilu.cn/webapi/cb/redeem/"
     referer = 'https://www.jisilu.cn/data/cbnew/'
@@ -480,7 +485,10 @@ def update_expired_bonds():
                 }        
             expriry_bond.append(cache)
     
-    
+    redis_manager.set_data('upcoming_mandatory_redeem_bonds',not_redeem_condition)
+    redis_manager.set_data('mandatory_redeem_condition_bonds',redeem_condition)
+    redis_manager.set_data('redeem_announced_bonds',redeem_notice)
+    redis_manager.set_data('upcoming_natural_expire_bonds',expriry_bond)
     # return (
     #     create_result(200, '成功', not_redeem_condition),
     #     create_result(200, '成功', redeem_condition),

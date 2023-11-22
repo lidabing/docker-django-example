@@ -22,4 +22,5 @@ def slow_task():
     JisiluData.update_proposed_adjust_bonds()
     JisiluData.update_upcoming_adjust_condition_bonds()
     JisiluData.update_expired_bonds()
+    JisiluData.update_expired_bonds()
     print('slow_task')
