@@ -7,6 +7,8 @@ import requests
 from enum import Enum
 from v1.common import *
 from v1.redis_manager import redis_manager
+from v1.models import V1Model
+
 
 def create_result(code, msg, data):
     return {
@@ -15,24 +17,22 @@ def create_result(code, msg, data):
         "data": data
     }
 
-#集思录的基础数据
-def read_cookie_from_file(file_path):
-    """
-    从文件中读取cookie。
+from v1.models import V1Model
 
-    参数:
-        file_path: cookie文件的路径。
+def read_jisilu_cookie():
+    try:
+        v1_instance = V1Model.objects.first()  # 获取第一个 V1Model 实例
+        jisilu_cookie = v1_instance.jisilu_cookie  # 获取 jisilu_cookie 的值
+    except V1Model.DoesNotExist:
+        print("警告：没有找到 V1Model 实例,jisilu_cookie 将被设置为 None")
+        jisilu_cookie = None  # 如果没有 V1Model 实例，设置 jisilu_cookie 为 None
 
-    返回:
-        文件的内容。
-    """
-    with open(file_path, 'r') as f:
-        return f.read()
+    print(f"读取到的集思录 cookie 为: {jisilu_cookie}")
+    return jisilu_cookie
 
 
 def get_bond_data(url, referer):
-    cookie_file = os.path.dirname(os.path.realpath(__file__)) +"/cookie.txt"
-    cookie = read_cookie_from_file(cookie_file)  
+    cookie = read_jisilu_cookie()  
     headers = {
         'Referer': referer,
         'cookie': cookie,
@@ -110,8 +110,8 @@ def updata_realtime_bonds_market_data():
     if response.status_code == 200:
         data = response.json()
         realtime_bond_market_data = data.get("data", [])
-        new_data = create_result(response.status_code,'成功',realtime_bond_market_data)
-        redis_manager.set_data('realtime_bonds_market_data',new_data)
+        #new_data = create_result(response.status_code,'成功',realtime_bond_market_data)
+        redis_manager.set_data('realtime_bonds_market_data',realtime_bond_market_data)
     else:
         print(f"请求失败，状态码: {response.status_code}")
         
@@ -206,7 +206,7 @@ def update_upcoming_adjust_bonds():
         adjust_bonds_data = data.get("data", [])
     else:
         print(f"请求失败，状态码: {adjust_bonds_response.status_code}")
-        return create_result(adjust_bonds_response.status_code,'请求失败')
+        #return create_result(adjust_bonds_response.status_code,'请求失败')
     print('update_upcoming_adjust_bonds1')
     #print('data:',adjust_bonds_data)
     result = []
@@ -318,7 +318,7 @@ def update_proposed_adjust_bonds():
 # key->upcoming_adjust_condition_bonds
 def update_upcoming_adjust_condition_bonds():
     #先获取基础转债信息
-    print('update_upcoming_adjust_condition_bonds')
+    #print('update_upcoming_adjust_condition_bonds')
     basic_bonds_data = get_basic_bonds_data()
     
      #再获取基础转债信息
@@ -332,7 +332,7 @@ def update_upcoming_adjust_condition_bonds():
     else:
         print(f"请求失败，状态码: {adjust_bonds_response.status_code}")
         #return create_result(adjust_bonds_response.status_code,'请求失败')
-    print('update_upcoming_adjust_condition_bonds1')
+    #print('update_upcoming_adjust_condition_bonds1')
     #['转债名称','转债代码','收盘价','溢价率','下修重算日','到期税前收益率','剩余年限','备注']
     result = []
     for bond_data in adjust_bonds_data:
@@ -423,7 +423,7 @@ def update_expired_bonds():
         redeem_bonds_data = data.get("data", [])
     else:
         print(f"请求失败，状态码: {response.status_code}")
-        return create_result(response.status_code,'请求失败')
+        #return create_result(response.status_code,'请求失败')
     
     basic_bonds_data = get_basic_bonds_data()
     
@@ -436,7 +436,7 @@ def update_expired_bonds():
             compliance_days = int(number[0])#numbers[1]-numbers[0]
             dif_days =  int(number[1])-  int(number[0])
             if compliance_days>5:
-                print("即将达到强赎条件")
+                #print("即将达到强赎条件")
                 cache = {
                 "bond_nm": item["bond_nm"],
                 "bond_id": int(item["bond_id"]),
@@ -461,7 +461,7 @@ def update_expired_bonds():
             redeem_condition.append(cache)
 
         elif status == RedeemStatus.REDEEM_NOTICE:
-            print("发出强赎公告")
+            #print("发出强赎公告")
             cache = {
                 "bond_nm": item["bond_nm"],
                 "bond_id": int(item["bond_id"]),
@@ -474,7 +474,7 @@ def update_expired_bonds():
  
 
         elif status == RedeemStatus.EXPIRING_BOND:
-            print("转债即将到期")
+            #print("转债即将到期")
             cache = {
                 "bond_nm": item["bond_nm"],
                 "bond_id": int(item["bond_id"]),
