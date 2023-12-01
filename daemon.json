@@ -1,1 +1,6 @@
-{  "registry-mirrors": ["https://registry.docker-cn.com"]}
+{
+    "registry-mirrors": [
+        "https://docker.m.daocloud.io",
+        "https://dockerproxy.com"
+    ]
+}
