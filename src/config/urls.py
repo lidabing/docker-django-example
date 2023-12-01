@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include
 from django.urls import path
+
 from v1.urls import urlpatterns as v1_urls  # 导入bonds应用的urlpatterns
 
 urlpatterns = [
@@ -24,5 +25,5 @@ urlpatterns = [
     path("", include("pages.urls")),
     path("admin/", admin.site.urls),
     path("__debug__/", include("debug_toolbar.urls")),
-    path('v1/', include(v1_urls)),  # 包含bonds应用的URL配置
+    path("v1/", include(v1_urls)),  # 包含bonds应用的URL配置
 ]

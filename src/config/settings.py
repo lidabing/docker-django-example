@@ -11,9 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 import socket
+#from datetime import datetime
+#from datetime import timedelta
 from distutils.util import strtobool
 from pathlib import Path
-from datetime import datetime, timedelta
 
 # Build paths inside the project like this: BASE_DIR / "subdir".
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    'v1',
+    "v1",
 ]
 
 MIDDLEWARE = [
@@ -164,9 +165,9 @@ if DEBUG:
 
 
 CELERY_BEAT_SCHEDULE = {
-    'slow-scheduled-task': {
-        'task': 'v1.tasks.slow_task',
-        'schedule': 3600.0, # 一小时启动一次慢任务
+    "slow-scheduled-task": {
+        "task": "v1.tasks.slow_task",
+        "schedule": 3600.0,  # 一小时启动一次慢任务
     },
 }
 
