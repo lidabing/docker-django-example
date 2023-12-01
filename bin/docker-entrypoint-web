@@ -7,3 +7,4 @@ set -e
 cp -r /public_collected /app
 
 exec "$@"
+ 

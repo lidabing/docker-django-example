@@ -86,7 +86,7 @@ services:
     ports:
       - "${DOCKER_WEB_PORT_FORWARD:-127.0.0.1:8000}:${PORT:-8000}"
     profiles: ["web"]
-
+ 
   worker:
     <<: *default-app
     command: bash -c "celery -A config worker --loglevel=info & celery -A config beat --loglevel=info"

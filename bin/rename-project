@@ -18,7 +18,7 @@ if [ "${APP_NAME}" = "${FIND_APP_NAME}" ]; then
     echo "Your new app name must be different than the current app name"
     exit 1
 fi
-
+ 
 cat << EOF
 When renaming your project you'll need to re-create a new database.
 

@@ -192,7 +192,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/).
 - Rename `run flake8` to `run lint`
 - Rename `run black` to `run format`
 - Rename `run bash` to `run shell`
-
+ 
 #### Languages and services
 
 - Update `Node` to `16.13.1`
