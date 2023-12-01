@@ -5,7 +5,6 @@ WORKDIR /app/assets
 
 ARG UID=1000
 ARG GID=1000
-
 ADD sources.list /etc/apt/
 RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential \
@@ -41,7 +40,6 @@ WORKDIR /app
 
 ARG UID=1000
 ARG GID=1000
-
 ADD sources.list /etc/apt/
 RUN apt-get update \
   && apt-get install -y --no-install-recommends build-essential curl libpq-dev \
