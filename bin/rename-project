@@ -8,7 +8,7 @@ MODULE_NAME="${2}"
 FIND_APP_NAME="hello"
 FIND_MODULE_NAME="Hello"
 FIND_FRAMEWORK="django"
-
+ 
 if [ -z "${APP_NAME}" ] || [ -z "${MODULE_NAME}" ]; then
     echo "You must supply both an app and module name, example: ${0} myapp MyApp"
     exit 1
