@@ -449,3 +449,30 @@ There's hundreds of [blog posts](https://nickjanetakis.com/blog/) and a couple
 of [video courses](https://nickjanetakis.com/courses/) on web development and
 deployment topics. I also have a [podcast](https://runninginproduction.com)
 where I talk with folks about running web apps in production.
+
+
+GitHub Copilot: 如果你的 Docker 控制台消失了，你可以通过以下步骤重新打开它：
+
+1. 打开一个新的终端窗口或者命令行界面。
+
+2. 使用 `docker ps` 命令查看所有正在运行的 Docker 容器。这个命令会显示每个容器的 ID、镜像、命令、创建时间、状态、端口和名称。
+
+```bash
+docker ps
+```
+
+3. 找到你想要查看控制台的容器的 ID 或名称。
+
+4. 使用 `docker logs` 命令查看该容器的日志。这个命令会显示容器的控制台输出。例如，如果你的容器 ID 是 `abc123`，你可以运行以下命令：
+
+```bash
+docker logs abc123
+```
+
+5. 如果你想实时查看容器的控制台输出，你可以添加 `-f` 或 `--follow` 选项：
+
+```bash
+docker logs -f abc123
+```
+
+这个命令会持续显示容器的新输出，直到你停止它（例如，通过按 `Ctrl+C`）。
